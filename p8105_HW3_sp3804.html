@@ -518,6 +518,20 @@ instacart %&gt;%
 ##   &lt;chr&gt;            &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
 ## 1 Coffee Ice Cream  13.8  14.3  15.4  15.3  15.2  12.3  13.8
 ## 2 Pink Lady Apples  13.4  11.4  11.7  14.2  11.6  12.8  11.9</code></pre>
+<div id="problem-2" class="section level1">
+<h1>Problem 2</h1>
+<p>Load, tidy, and otherwise wrangle the data. Your final dataset should include all originally observed variables and values; have useful variable names; include a weekday vs weekend variable; and encode data with reasonable variable classes. Describe the resulting dataset (e.g. what variables exist, how many observations, etc). - pivot (day- numeric format? character? it affects to the third part in the third sub question)</p>
+<p>Traditional analyses of accelerometer data focus on the total activity over the day. Using your tidied dataset, aggregate accross minutes to create a total activity variable for each day, and create a table showing these totals. Are any trends apparent? –&gt; group_by, summarise –&gt; potential issue: day of week column (default; alphabetical order), we have to change the order</p>
+<p>Accelerometer data allows the inspection activity over the course of the day. Make a single-panel plot that shows the 24-hour activity time courses for each day and use color to indicate day of the week. Describe in words any patterns or conclusions you can make based on this graph. - scatterplot (x-axis minute time y; activities) + line - color ; day of week - conclusion; weekday vs. weekend etc</p>
+<p>#Problem 3</p>
+<pre class="r"><code>library(p8105.datasets)
+data(&quot;ny_noaa&quot;)</code></pre>
+<p>Do some data cleaning. Create separate variables for year, month, and day. Ensure observations for temperature, precipitation, and snowfall are given in reasonable units. For snowfall, what are the most commonly observed values? Why?</p>
+<p>Make a two-panel plot showing the average max temperature in January and in July in each station across years. Is there any observable / interpretable structure? Any outliers? - data manipulation - pplot - facet</p>
+<div id="make-a-two-panel-plot-showing-i-tmax-vs-tmin-for-the-full-dataset-note-that-a-scatterplot-may-not-be-the-best-option-and-ii-make-a-plot-showing-the-distribution-of-snowfall-values-greater-than-0-and-less-than-100-separately-by-year." class="section level2">
+<h2>Make a two-panel plot showing (i) tmax vs tmin for the full dataset (note that a scatterplot may not be the best option); and (ii) make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year.</h2>
+</div>
+</div>
 
 
 
