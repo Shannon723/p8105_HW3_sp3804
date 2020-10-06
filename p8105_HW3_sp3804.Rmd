@@ -7,24 +7,74 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(p8105.datasets)
+library(tidyverse)
+library(janitor)
 ```
 
-## R Markdown
+```{R}
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+data("instacart")
+glimpse(instacart)
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+instacart```
+````
 
-```{r cars}
-summary(cars)
+Problem 0
+This “problem” focuses on structure of your submission, especially the use git and GitHub for reproducibility, R Projects to organize your work, R Markdown to write reproducible reports, relative paths to load data from local files, and reasonable naming structures for your files.
+
+This dataset contains `r nrow(instacart)` rows and .... columns.
+Observations are the level of items in orders by user. There are user / order variables -- user ID, order ID, order day, and order hour. There ar ealso item varialbes -- name, aisle, department, and some numeric codes. 
+
+How many aisles, and which ar emost items from?
+```{r}
+instacart %>%
+  count(aisle)%>%
+  arrange(desc(n))
+
 ```
 
-## Including Plots
+Let's makd a plot
 
-You can also embed plots, for example:
+```{r}
+instacart %>%
+  count(aisle)%>%
+  filter(n>10000)%>%
+  ggplot(aes(x=aisle, y=n))+
+  geom_point() # looks unclear 
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+## rotate the text in x-axis, reoder aisle in ascending order. 
+
+instacart %>%
+  count(aisle)%>%
+  filter(n>10000)%>%
+  mutate(
+    aisle = factor(aisle),
+    aisle = fct_reorder(aisle, n)
+  ) %>%
+  ggplot(aes(x=aisle, y=n))+
+  geom_point()+
+  theme(axis.text.x = element_text(angle = 90, vjust =0.5, hjust=1))
+
+```
+Make a table showing the three most popular items in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”. Include the number of times each item is ordered in your table.
+
+```{r}
+instacart %>%
+  filter(aisle %in% c("baking ingredients", "dog food care","packaged vegetables fruits")) %>%
+  group_by(aisle) %>%
+  count(product_name)%>%
+  mutate(rank = min_rank(desc(n))) %>%
+  filter(rank <4) %>%
+  arrange(aisle, rank) %>%
+  knitr::kable()
+
+```
+Make a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table).
+
+```{r}
+
+
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
