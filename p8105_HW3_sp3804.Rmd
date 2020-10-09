@@ -88,14 +88,62 @@ instacart %>%
 Load, tidy, and otherwise wrangle the data. Your final dataset should include all originally observed variables and values; have useful variable names; include a weekday vs weekend variable; and encode data with reasonable variable classes. Describe the resulting dataset (e.g. what variables exist, how many observations, etc).
 - pivot (day- numeric format? character? it affects to the third part in the third sub question)
 ```{r}
+Accelerometers = 
+  read_csv("./accel_data.csv") %>%
+  janitor::clean_names() 
+Accelerometers = Accelerometers  %>%
+  pivot_longer(
+    activity_1:activity_1440,
+    names_to = "activity_number",
+    names_prefix = "activity_",
+    values_to = "activity_count")
+Accelerometers = Accelerometers %>% 
+  mutate(weekend = if_else(day=="Saturday"|day=="Sunday", 1,
+                           if_else(day=="Monday"|day=="Tuesday"|day=="Wednesday"|day=="Thursday"|day=="Friday",
+                                   0, NA_real_))) %>%
+  mutate(weekday = if_else(day=="Monday"|day=="Tuesday"|day=="Wednesday"|day=="Thursday"|day=="Friday", 1,
+                           if_else(day=="Saturday"|day=="Sunday", 0, NA_real_)))
+  
 
+Accelerometers = Accelerometers %>% 
+  mutate(day = if_else(day =="Monday", 1,
+                       if_else(day=="Tuesday",2,
+                               if_else(day=="Wednesday",3,
+                                       if_else(day=="Thursday", 4,
+                                               if_else(day=="Friday",5,
+                                                       if_else(day=="Saturday",6,
+                                                               if_else(day=="Sunday",7, NA_real_))))))))
 
+Accelerometers = Accelerometers %>% 
+  mutate(activity_number=as.numeric(activity_number))
+Accelerometers = Accelerometers %>% 
+  arrange(week,day) 
 
+glimpse(Accelerometers)
+  
 ```
+This is the five weeks of accelerometer data collected on a 63 year-old male with BMI 25, who was admitted to the Advanced Cardiac Care Center of Columbia University Medical Center and diagnosed with congestive heart failure (CHF). In this spreadsheet, variables activity.* are the activity counts for each minute of a 24-hour day starting at midnight.
+So what's going on in these datasets? First we examine Accelerometers. This dataset has `r nrow(Accelerometers)` observations and `r ncol(Accelerometers)` variables. All variables are class `numeric` (double). 
+
+
 
 Traditional analyses of accelerometer data focus on the total activity over the day. Using your tidied dataset, aggregate accross minutes to create a total activity variable for each day, and create a table showing these totals. Are any trends apparent?
 --> group_by, summarise 
 --> potential issue: day of week column (default; alphabetical order), we have to change the order
+```{r}
+Accelerometers %>%
+  group_by(week, day) %>%
+  summarise(daily_activity = mean(activity_count)) %>%
+  knitr::kable()
+
+Accelerometers %>%
+  group_by(day) %>%
+  summarise(daily_activity = mean(activity_count)) %>%
+  knitr::kable()
+
+````
+Just by seeing the total activity for each day of week, it's hard to see any apprant trends. 
+
 
 Accelerometer data allows the inspection activity over the course of the day. Make a single-panel plot that shows the 24-hour activity time courses for each day and use color to indicate day of the week. Describe in words any patterns or conclusions you can make based on this graph.
 - scatterplot (x-axis minute time y; activities) + line 

@@ -521,16 +521,297 @@ instacart %&gt;%
 <div id="problem-2" class="section level1">
 <h1>Problem 2</h1>
 <p>Load, tidy, and otherwise wrangle the data. Your final dataset should include all originally observed variables and values; have useful variable names; include a weekday vs weekend variable; and encode data with reasonable variable classes. Describe the resulting dataset (e.g. what variables exist, how many observations, etc). - pivot (day- numeric format? character? it affects to the third part in the third sub question)</p>
+<pre class="r"><code>Accelerometers = 
+  read_csv(&quot;./accel_data.csv&quot;) %&gt;%
+  janitor::clean_names() </code></pre>
+<pre><code>## Parsed with column specification:
+## cols(
+##   .default = col_double(),
+##   day = col_character()
+## )</code></pre>
+<pre><code>## See spec(...) for full column specifications.</code></pre>
+<pre class="r"><code>Accelerometers = Accelerometers  %&gt;%
+  pivot_longer(
+    activity_1:activity_1440,
+    names_to = &quot;activity_number&quot;,
+    names_prefix = &quot;activity_&quot;,
+    values_to = &quot;activity_count&quot;)
+Accelerometers = Accelerometers %&gt;% 
+  mutate(weekend = if_else(day==&quot;Saturday&quot;|day==&quot;Sunday&quot;, 1,
+                           if_else(day==&quot;Monday&quot;|day==&quot;Tuesday&quot;|day==&quot;Wednesday&quot;|day==&quot;Thursday&quot;|day==&quot;Friday&quot;,
+                                   0, NA_real_))) %&gt;%
+  mutate(weekday = if_else(day==&quot;Monday&quot;|day==&quot;Tuesday&quot;|day==&quot;Wednesday&quot;|day==&quot;Thursday&quot;|day==&quot;Friday&quot;, 1,
+                           if_else(day==&quot;Saturday&quot;|day==&quot;Sunday&quot;, 0, NA_real_)))
+  
+
+Accelerometers = Accelerometers %&gt;% 
+  mutate(day = if_else(day ==&quot;Monday&quot;, 1,
+                       if_else(day==&quot;Tuesday&quot;,2,
+                               if_else(day==&quot;Wednesday&quot;,3,
+                                       if_else(day==&quot;Thursday&quot;, 4,
+                                               if_else(day==&quot;Friday&quot;,5,
+                                                       if_else(day==&quot;Saturday&quot;,6,
+                                                               if_else(day==&quot;Sunday&quot;,7, NA_real_))))))))
+
+Accelerometers = Accelerometers %&gt;% 
+  mutate(activity_number=as.numeric(activity_number))
+Accelerometers = Accelerometers %&gt;% 
+  arrange(week,day) 
+
+glimpse(Accelerometers)</code></pre>
+<pre><code>## Rows: 50,400
+## Columns: 7
+## $ week            &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,…
+## $ day_id          &lt;dbl&gt; 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,…
+## $ day             &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,…
+## $ activity_number &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16…
+## $ activity_count  &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,…
+## $ weekend         &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+## $ weekday         &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,…</code></pre>
+<p>This is the five weeks of accelerometer data collected on a 63 year-old male with BMI 25, who was admitted to the Advanced Cardiac Care Center of Columbia University Medical Center and diagnosed with congestive heart failure (CHF). In this spreadsheet, variables activity.* are the activity counts for each minute of a 24-hour day starting at midnight. So what’s going on in these datasets? First we examine Accelerometers. This dataset has 50400 observations and 7 variables. All variables are class <code>numeric</code> (double).</p>
 <p>Traditional analyses of accelerometer data focus on the total activity over the day. Using your tidied dataset, aggregate accross minutes to create a total activity variable for each day, and create a table showing these totals. Are any trends apparent? –&gt; group_by, summarise –&gt; potential issue: day of week column (default; alphabetical order), we have to change the order</p>
+<pre class="r"><code>Accelerometers %&gt;%
+  group_by(week, day) %&gt;%
+  summarise(daily_activity = mean(activity_count)) %&gt;%
+  knitr::kable()</code></pre>
+<pre><code>## `summarise()` regrouping output by 'week' (override with `.groups` argument)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">week</th>
+<th align="right">day</th>
+<th align="right">daily_activity</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">54.74171</td>
+</tr>
+<tr class="even">
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">213.25989</td>
+</tr>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="right">236.19098</td>
+</tr>
+<tr class="even">
+<td align="right">1</td>
+<td align="right">4</td>
+<td align="right">247.16920</td>
+</tr>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">5</td>
+<td align="right">333.71015</td>
+</tr>
+<tr class="even">
+<td align="right">1</td>
+<td align="right">6</td>
+<td align="right">261.28750</td>
+</tr>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">7</td>
+<td align="right">438.26736</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="right">205.16042</td>
+</tr>
+<tr class="odd">
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="right">293.92014</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="right">3</td>
+<td align="right">306.22361</td>
+</tr>
+<tr class="odd">
+<td align="right">2</td>
+<td align="right">4</td>
+<td align="right">329.20000</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="right">5</td>
+<td align="right">395.02708</td>
+</tr>
+<tr class="odd">
+<td align="right">2</td>
+<td align="right">6</td>
+<td align="right">421.64931</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="right">7</td>
+<td align="right">293.06806</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="right">1</td>
+<td align="right">476.32639</td>
+</tr>
+<tr class="even">
+<td align="right">3</td>
+<td align="right">2</td>
+<td align="right">264.93542</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="right">3</td>
+<td align="right">325.60347</td>
+</tr>
+<tr class="even">
+<td align="right">3</td>
+<td align="right">4</td>
+<td align="right">257.79861</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="right">5</td>
+<td align="right">324.59722</td>
+</tr>
+<tr class="even">
+<td align="right">3</td>
+<td align="right">6</td>
+<td align="right">265.92222</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="right">7</td>
+<td align="right">324.34167</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="right">1</td>
+<td align="right">284.34028</td>
+</tr>
+<tr class="odd">
+<td align="right">4</td>
+<td align="right">2</td>
+<td align="right">221.92222</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="right">3</td>
+<td align="right">301.70833</td>
+</tr>
+<tr class="odd">
+<td align="right">4</td>
+<td align="right">4</td>
+<td align="right">236.31319</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="right">5</td>
+<td align="right">106.97847</td>
+</tr>
+<tr class="odd">
+<td align="right">4</td>
+<td align="right">6</td>
+<td align="right">1.00000</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="right">7</td>
+<td align="right">180.98403</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="right">1</td>
+<td align="right">270.19444</td>
+</tr>
+<tr class="even">
+<td align="right">5</td>
+<td align="right">2</td>
+<td align="right">255.43333</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="right">3</td>
+<td align="right">309.28194</td>
+</tr>
+<tr class="even">
+<td align="right">5</td>
+<td align="right">4</td>
+<td align="right">381.70694</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="right">5</td>
+<td align="right">431.15278</td>
+</tr>
+<tr class="even">
+<td align="right">5</td>
+<td align="right">6</td>
+<td align="right">1.00000</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="right">7</td>
+<td align="right">96.12569</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>Accelerometers %&gt;%
+  group_by(day) %&gt;%
+  summarise(daily_activity = mean(activity_count)) %&gt;%
+  knitr::kable()</code></pre>
+<pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">day</th>
+<th align="right">daily_activity</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">258.1526</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="right">249.8942</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="right">295.8017</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="right">290.4376</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="right">318.2931</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="right">190.1718</td>
+</tr>
+<tr class="odd">
+<td align="right">7</td>
+<td align="right">266.5574</td>
+</tr>
+</tbody>
+</table>
+<p>Just by seeing the total activity for each day of week, it’s hard to see any apprant trends.</p>
 <p>Accelerometer data allows the inspection activity over the course of the day. Make a single-panel plot that shows the 24-hour activity time courses for each day and use color to indicate day of the week. Describe in words any patterns or conclusions you can make based on this graph. - scatterplot (x-axis minute time y; activities) + line - color ; day of week - conclusion; weekday vs. weekend etc</p>
 <p>#Problem 3</p>
 <pre class="r"><code>library(p8105.datasets)
 data(&quot;ny_noaa&quot;)</code></pre>
 <p>Do some data cleaning. Create separate variables for year, month, and day. Ensure observations for temperature, precipitation, and snowfall are given in reasonable units. For snowfall, what are the most commonly observed values? Why?</p>
 <p>Make a two-panel plot showing the average max temperature in January and in July in each station across years. Is there any observable / interpretable structure? Any outliers? - data manipulation - pplot - facet</p>
-<div id="make-a-two-panel-plot-showing-i-tmax-vs-tmin-for-the-full-dataset-note-that-a-scatterplot-may-not-be-the-best-option-and-ii-make-a-plot-showing-the-distribution-of-snowfall-values-greater-than-0-and-less-than-100-separately-by-year." class="section level2">
-<h2>Make a two-panel plot showing (i) tmax vs tmin for the full dataset (note that a scatterplot may not be the best option); and (ii) make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year.</h2>
-</div>
+<p>Make a two-panel plot showing (i) tmax vs tmin for the full dataset (note that a scatterplot may not be the best option); and (ii) make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year. - filtering - show distribution - plot</p>
 </div>
 
 
