@@ -188,6 +188,7 @@ ny_noaa <- ny_noaa %>%
   mutate(year = year(ymd(date)),
         month = month(ymd(date)),
         day = day(ymd(date))) 
+
 ny_noaa = ny_noaa %>%
   mutate(t_max=as.numeric(tmax),
          t_min=as.numeric(tmin))
@@ -212,8 +213,9 @@ Make a two-panel plot showing the average max temperature in January and in July
 ny_noaa %>%
   filter(month==1|month==7) %>%
   group_by(id, year, month) %>%
-  summarize(mean_t_max = mean(tmax, na.rm = TRUE)) %>%
-  ggplot(aes(x=years,y=mean_t_max, colot=id)) + geom_point()
+  summarize(mean_t_max = mean(t_max, na.rm = TRUE)) %>%
+  ggplot(aes(x=year,y=mean_t_max, color=id)) + geom_point() + geom_path()+ facet_grid(~month)+
+  labs(title= "Average max temperature in January and in July in each station across years", x="year",y="mean max T")
 
 ```
 
