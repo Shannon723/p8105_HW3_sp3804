@@ -94,9 +94,10 @@ Accelerometers =
 Accelerometers = Accelerometers  %>%
   pivot_longer(
     activity_1:activity_1440,
-    names_to = "activity_number",
     names_prefix = "activity_",
+    names_to = "activity_number",
     values_to = "activity_count")
+
 Accelerometers = Accelerometers %>% 
   mutate(weekend = if_else(day=="Saturday"|day=="Sunday", 1,
                            if_else(day=="Monday"|day=="Tuesday"|day=="Wednesday"|day=="Thursday"|day=="Friday",
@@ -133,12 +134,12 @@ Traditional analyses of accelerometer data focus on the total activity over the 
 ```{r}
 Accelerometers %>%
   group_by(week, day) %>%
-  summarise(daily_activity = mean(activity_count)) %>%
+  summarise(total_activity = mean(activity_count)) %>%
   knitr::kable()
 
 Accelerometers %>%
   group_by(day) %>%
-  summarise(daily_activity = mean(activity_count)) %>%
+  summarise(total_activity = mean(activity_count)) %>%
   knitr::kable()
 
 ````
@@ -149,6 +150,29 @@ Accelerometer data allows the inspection activity over the course of the day. Ma
 - scatterplot (x-axis minute time y; activities) + line 
 - color ; day of week
 - conclusion; weekday vs. weekend etc
+```{r}
+Accelerometers  %>%
+  group_by(day, activity_number) %>%
+  summarise(daily_mean = mean(activity_count)) %>%
+  knitr::kable ()
+  
+hourly_activity_day = Accelerometers  %>%
+  group_by(day, activity_number) %>%
+  summarise(daily_mean = mean(activity_count)) %>%
+  mutate(time = activity_number / 60)
+
+glimpse(hourly_activity_day)
+
+hourly_activity_day %>%
+  ggplot(aes(x=time, y=daily_mean, group=day, color=day)) +geom_line() +ggtitle("<24-hour activity time courses each day>") +xlab("hour") +ylab("activity count")
+
+
+
+
+```
+
+
+
 
 
 #Problem 3
