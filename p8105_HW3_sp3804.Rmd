@@ -122,7 +122,6 @@ Accelerometers = Accelerometers %>%
 Accelerometers = Accelerometers %>% 
   arrange(week,day) 
 
-glimpse(Accelerometers)
   
 ```
 This is the five weeks of accelerometer data collected on a 63 year-old male with BMI 25, who was admitted to the Advanced Cardiac Care Center of Columbia University Medical Center and diagnosed with congestive heart failure (CHF). In this spreadsheet, variables activity.* are the activity counts for each minute of a 24-hour day starting at midnight.
@@ -153,10 +152,6 @@ Accelerometer data allows the inspection activity over the course of the day. Ma
 - color ; day of week
 - conclusion; weekday vs. weekend etc
 ```{r}
-Accelerometers  %>%
-  group_by(day, activity_number) %>%
-  summarise(daily_mean = mean(activity_count)) %>%
-  knitr::kable ()
   
 hourly_activity_day = Accelerometers  %>%
   group_by(day, activity_number) %>%
@@ -167,8 +162,6 @@ glimpse(hourly_activity_day)
 
 hourly_activity_day %>%
   ggplot(aes(x=time, y=daily_mean, group=day, color=day)) +geom_line() +ggtitle("<24-hour activity time courses each day>") +xlab("hour") +ylab("activity count")
-
-
 
 
 ```
@@ -215,8 +208,9 @@ ny_noaa %>%
   filter(month==1|month==7) %>%
   group_by(id, year, month) %>%
   summarize(mean_t_max = mean(t_max, na.rm = TRUE)) %>%
-  ggplot(aes(x=year,y=mean_t_max, color=id)) + geom_point() + geom_path()+ facet_grid(~month)+
-  labs(title= "Average max temperature in January and in July in each station across years", x="year",y="mean max T")
+  ggplot(aes(x=year,y=mean_t_max, group=id, color=id)) + geom_point() + geom_path()+ facet_grid(~month)+
+  labs(title= "<Average max temperature in January and in July in each station across years>", x="year",y="mean max T")+
+  theme(legend.position = "none")
 
 ```
 
