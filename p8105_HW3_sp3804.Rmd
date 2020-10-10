@@ -3,8 +3,7 @@ title: "p8105_HW3_sp3804"
 author: "Seonyoung Park (sp3804)"
 date: "10/6/2020"
 output:
-  pdf_document: default
-  html_document: default
+  output: github_document
 ---
 
 ```{r setup, include=FALSE}
